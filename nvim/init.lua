@@ -175,26 +175,25 @@ vim.keymap.set("n", "<leader>ws", "<C-w>s")
 -- Diagnostic keymaps
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
--- .NET run/test commands
+-- .NET run/test commands (right 40% vertical split)
 vim.keymap.set("n", "<leader>rp", function()
-	-- Find the API/startup project relative to the git root
 	local root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
 	local api_proj = root .. "/API/API.csproj"
+	local width = math.floor(vim.o.columns * 0.4)
 	if vim.fn.filereadable(api_proj) == 1 then
-		vim.cmd("belowright split | terminal dotnet run --project " .. api_proj)
+		vim.cmd("botright vsplit | vertical resize " .. width .. " | terminal dotnet run --project " .. api_proj)
 	else
-		-- Fallback: look for any .sln or .csproj in root
-		vim.cmd("belowright split | terminal dotnet run")
+		vim.cmd("botright vsplit | vertical resize " .. width .. " | terminal dotnet run")
 	end
 end, { desc = "[R]un [P]roject (dotnet)" })
 
 vim.keymap.set("n", "<leader>rt", function()
 	local root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-	vim.cmd("belowright split | terminal dotnet test " .. root)
+	local width = math.floor(vim.o.columns * 0.4)
+	vim.cmd("botright vsplit | vertical resize " .. width .. " | terminal dotnet test " .. root)
 end, { desc = "[R]un [T]ests (dotnet)" })
 
 vim.keymap.set("n", "<leader>rs", function()
-	-- Stop any running dotnet terminal
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 		if vim.bo[buf].buftype == "terminal" then
 			local name = vim.api.nvim_buf_get_name(buf)
