@@ -655,6 +655,18 @@ require("lazy").setup({
 				-- tsserver = {},
 				--
 
+				omnisharp = {
+					settings = {
+						FormattingOptions = {
+							EnableEditorConfigSupport = true,
+						},
+						RoslynExtensionsOptions = {
+							EnableAnalyzersSupport = true,
+							EnableImportCompletion = true,
+						},
+					},
+				},
+
 				lua_ls = {
 					-- cmd = {...},
 					-- filetypes = { ...},
