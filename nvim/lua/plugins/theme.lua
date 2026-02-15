@@ -5,7 +5,7 @@ return {
 	priority = 1000,
 	opts = {
 		flavour = "mocha",
-		transparent_background = false,
+		transparent_background = true,
 		integrations = {
 			gitsigns = true,
 			telescope = true,
