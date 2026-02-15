@@ -175,6 +175,36 @@ vim.keymap.set("n", "<leader>ws", "<C-w>s")
 -- Diagnostic keymaps
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
+-- .NET run/test commands
+vim.keymap.set("n", "<leader>rp", function()
+	-- Find the API/startup project relative to the git root
+	local root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+	local api_proj = root .. "/API/API.csproj"
+	if vim.fn.filereadable(api_proj) == 1 then
+		vim.cmd("belowright split | terminal dotnet run --project " .. api_proj)
+	else
+		-- Fallback: look for any .sln or .csproj in root
+		vim.cmd("belowright split | terminal dotnet run")
+	end
+end, { desc = "[R]un [P]roject (dotnet)" })
+
+vim.keymap.set("n", "<leader>rt", function()
+	local root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+	vim.cmd("belowright split | terminal dotnet test " .. root)
+end, { desc = "[R]un [T]ests (dotnet)" })
+
+vim.keymap.set("n", "<leader>rs", function()
+	-- Stop any running dotnet terminal
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		if vim.bo[buf].buftype == "terminal" then
+			local name = vim.api.nvim_buf_get_name(buf)
+			if name:match("dotnet") then
+				vim.api.nvim_buf_delete(buf, { force = true })
+			end
+		end
+	end
+end, { desc = "[R]un [S]top (kill dotnet terminal)" })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
