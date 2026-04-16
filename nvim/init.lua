@@ -1014,6 +1014,7 @@ require("lazy").setup({
 	require("plugins.autoclose"),
 	require("plugins.autotag"),
 	require("plugins.mini_surround"),
+	require("plugins.diffview"),
 	-- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
 	-- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
