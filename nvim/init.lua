@@ -514,8 +514,8 @@ require("lazy").setup({
 			"hrsh7th/cmp-nvim-lsp",
 		},
 		config = function()
-			-- ESLint LSP setup
-			require("lspconfig").eslint.setup({
+			-- ESLint LSP setup (nvim 0.11+ API)
+			vim.lsp.config("eslint", {
 				on_attach = function(client, bufnr)
 					-- Enable document formatting
 					client.server_capabilities.documentFormattingProvider = true
@@ -537,6 +537,7 @@ require("lazy").setup({
 					},
 				},
 			})
+			vim.lsp.enable("eslint")
 			-- Brief aside: **What is LSP?**
 			--
 			-- LSP is an initialism you've probably heard, but might not understand what it is.
