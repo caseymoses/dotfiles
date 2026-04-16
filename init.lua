@@ -261,6 +261,14 @@ require("lazy").setup({
 				topdelete = { text = "‾" },
 				changedelete = { text = "~" },
 			},
+			on_attach = function(bufnr)
+				local gs = package.loaded.gitsigns
+				vim.keymap.set("n", "]h", gs.next_hunk,    { buffer = bufnr, desc = "Next Git [H]unk" })
+				vim.keymap.set("n", "[h", gs.prev_hunk,    { buffer = bufnr, desc = "Prev Git [H]unk" })
+				vim.keymap.set("n", "<leader>hp", gs.preview_hunk, { buffer = bufnr, desc = "[H]unk [P]review" })
+				vim.keymap.set("n", "<leader>hr", gs.reset_hunk,   { buffer = bufnr, desc = "[H]unk [R]eset" })
+				vim.keymap.set("n", "<leader>hs", gs.stage_hunk,   { buffer = bufnr, desc = "[H]unk [S]tage" })
+			end,
 		},
 	},
 
