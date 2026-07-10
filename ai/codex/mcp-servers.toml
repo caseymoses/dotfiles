@@ -1,0 +1,12 @@
+# MCP servers every Codex install should have. install-ai.sh appends these to
+# ~/.codex/config.toml only if the server isn't already registered — it never
+# rewrites the whole file (the Codex app owns other keys in it).
+#
+# CIL runs on the mac mini (static IP 192.168.68.200). That address also works
+# FROM the mini itself, so this block is portable to every machine as-is.
+
+[mcp_servers.cil]
+url = "http://192.168.68.200:7781/mcp"
+
+[mcp_servers.linear]
+url = "https://mcp.linear.app/mcp"

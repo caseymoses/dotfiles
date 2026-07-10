@@ -46,6 +46,9 @@ ln -sf "$DOTFILES/nvim" ~/.config/nvim
 # Tmux
 ln -sf "$DOTFILES/tmux.conf" ~/.tmux.conf
 
+# AI assistant configs (Claude Code + Codex) — see ai/install-ai.sh
+"$DOTFILES/ai/install-ai.sh"
+
 echo ""
 echo "✅ Done! Remaining manual steps:"
 echo "  1. Add to ~/.zshrc if not already there:"
