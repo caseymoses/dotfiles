@@ -15,6 +15,55 @@ The CIL MCP is backed by vector search plus a graph database built from Tree-sit
 - **Dev-workflow / tooling ideas** belong to the **"Dev Workflow & Tooling" project under the Casey Moses team (`CAS-*`)** — never the product team. Rough capture beats losing the thought: title + two sentences of context is enough.
 - Repo-specific workflow rules live in each repo's `AGENTS.md`/`CLAUDE.md` — read those before implementing; this file only carries cross-repo conventions.
 
+## Automated dev pipeline (agent-dispatch) — how work is routed
+
+Casey's main development path (from 2026-08-31) is the autonomous lane
+pipeline on the mac mini: repo `caseymoses/agent-dispatch` (local
+`~/Code/agent-dispatch`), sibling of `pr-review-service`. Interactive
+sessions — Codex, Claude Code, Bob — are for **orchestration, small tasks, and
+building out the pipeline itself**, not for implementing stories.
+
+**Routing rule**
+
+- **Story/feature work that has a Linear issue → the pipeline.** In-session,
+  get the issue decision-complete (acceptance criteria, mockup path, dated
+  DECISION blocks in the description, open questions answered), then move it
+  to the team's **Ready** column or hand Casey the drag. Do NOT implement it
+  in-session and do NOT spin up background implementation tasks for it — that
+  duplicates the pipeline and races it on the same branch.
+- **Small tasks → in-session:** quick fixes, doc/config edits, investigations,
+  Linear grooming, questions. The "Background PR review watchers" rule below
+  still applies to any small task that opens a PR from a session.
+- **Harness build-out (agent-dispatch, pr-review-service, QA agent, deploy
+  step) → in-session with Casey**; pipeline-improvement tasks are dogfooded
+  through the pipeline wherever it can already handle them.
+
+**What a Ready issue gets:** claim (→ Dev Planning) → worktree from fresh
+`origin/main` → plan phase (plan posted as a Linear comment; product questions
+park the issue with the `needs-input` label + Discord ping instead of
+guessing; answer-and-re-drag re-dispatches) → dev phase in a herdr pane
+(test-first, one ready PR; → In Progress, then Code Review at PR-open) →
+automated review rounds fed back to the still-live lane (that repo's
+review-round protocol, max 4) → consensus APPROVE = delivery digest on the
+issue + In Review + Discord ping. Agents report only through `.dispatch/`
+status files; the dispatcher never parses prose. **Merging stays human.** Not
+built yet: QA phase (CAS-243), deploy/release-notes step (CAS-244), auto-merge
+gate, local intermediate review rounds (CAS-240).
+
+**Linear state map (who flips):** Ready (Casey) → Dev Planning / In Progress /
+Code Review / In Review (dispatcher) → Ready for Deploy (GitHub merge
+automation) → Done (Casey at prod deploy). A parked lane keeps its column;
+`needs-input` is a label, not a state.
+
+**Where it lives:** mini `~/.hermes/scripts/agent_dispatch/` (launchd
+`com.casey.agent-dispatch`, 120s ticks), config
+`~/.hermes/dispatch-config.json` (per-machine — models and autonomy flags live
+here; deploy never clobbers it), lanes `~/.hermes/dispatch-state/lanes.json`,
+log `~/.hermes/logs/agent-dispatch.log`, review artifacts
+`~/.hermes/pr-reviews/<owner>__<repo>/pr-N/<sha12>/`. Configured for hoppin
+only today (team HOP, one repo slug); onboarding another project is a config
+entry plus that repo's own review-round protocol in its `AGENTS.md`.
+
 ## Background PR review watchers
 
 When dispatching a background implementation session that will open a pull

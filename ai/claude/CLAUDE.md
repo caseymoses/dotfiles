@@ -83,3 +83,25 @@ Casey's standing preference (2026-07-08): use subagents for parallelism and to p
 2. The orchestrator (main agent) reads the Linear issue itself and **composes the subagent prompt**: paste the issue content verbatim + add exemplar file paths, current branch/state, verification commands (tests/type-check/build), the CIL/grep search-first rule, and the expected report format. Don't make subagents fetch Linear or rediscover context — MCP availability in subagent contexts is unreliable and curation is the orchestrator's job.
 3. Subagents verify their own work (run the tests/build); the main agent re-verifies before committing. The PR auto-review pipeline is the second net, never the first.
 4. Watch the metric: if delegated work needs more review rounds than solo work (~2-round baseline on hoppin), pull that task class back to the main agent.
+
+## Automated dev pipeline (agent-dispatch) — how work is routed
+
+Casey's main development path (from 2026-08-31) is the autonomous lane pipeline on the mac mini: repo `caseymoses/agent-dispatch` (local `~/Code/agent-dispatch`), sibling of `pr-review-service`. Interactive sessions — Claude Code, Codex, Bob — are for **orchestration, small tasks, and building out the pipeline itself**, not for implementing stories.
+
+### Routing rule
+
+- **Story/feature work that has a Linear issue → the pipeline.** In-session, get the issue decision-complete (acceptance criteria, mockup path, dated DECISION blocks in the description, open questions answered), then move it to the team's **Ready** column or hand Casey the drag. Do NOT implement it in-session and do NOT spin up subagent/background lanes for it — that duplicates the pipeline and races it on the same branch.
+- **Small tasks → in-session:** quick fixes, doc/config edits, investigations, Linear grooming, questions. The delegation policy above governs how those are split across subagents.
+- **Harness build-out (agent-dispatch, pr-review-service, QA agent, deploy step) → in-session with Casey**; pipeline-improvement tasks are dogfooded through the pipeline wherever it can already handle them.
+
+### What a Ready issue gets
+
+claim (→ Dev Planning) → worktree from fresh `origin/main` → plan phase (plan posted as a Linear comment; product questions park the issue with the `needs-input` label + Discord ping instead of guessing; answer-and-re-drag re-dispatches) → dev phase in a herdr pane (test-first, one ready PR; → In Progress, then Code Review at PR-open) → automated review rounds fed back to the still-live lane (that repo's review-round protocol, max 4) → consensus APPROVE = delivery digest on the issue + In Review + Discord ping. Agents report only through `.dispatch/` status files; the dispatcher never parses prose. **Merging stays human.** Not built yet: QA phase (CAS-243), deploy/release-notes step (CAS-244), auto-merge gate, local intermediate review rounds (CAS-240).
+
+### Linear state map (who flips)
+
+Ready (Casey) → Dev Planning / In Progress / Code Review / In Review (dispatcher) → Ready for Deploy (GitHub merge automation) → Done (Casey at prod deploy). A parked lane keeps its column; `needs-input` is a label, not a state.
+
+### Where it lives
+
+Mini: `~/.hermes/scripts/agent_dispatch/` (launchd `com.casey.agent-dispatch`, 120s ticks), config `~/.hermes/dispatch-config.json` (per-machine — models and autonomy flags live here; deploy never clobbers it), lanes `~/.hermes/dispatch-state/lanes.json`, log `~/.hermes/logs/agent-dispatch.log`, review artifacts `~/.hermes/pr-reviews/<owner>__<repo>/pr-N/<sha12>/`. Configured for hoppin only today (team HOP, one repo slug); onboarding another project is a config entry plus that repo's own review-round protocol in its `AGENTS.md`.
